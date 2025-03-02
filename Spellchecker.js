@@ -67,11 +67,13 @@ function enableSpellCheck(textbox) {
     textbox.addEventListener('contextmenu', (event) => handleRightClick(event, textbox));
 }
 
-// Function to check spelling and underline mistakes
+// Function to check spelling and underline mistakes using textContent
 function checkSpelling(textbox) {
     if (!dictionary) return;
 
-    let words = textbox.innerText.split(/\s+/);
+    let text = textbox.textContent; // Get raw text content
+    let words = text.split(/\s+/);
+    
     let correctedHTML = words
         .map(word => {
             if (dictionary && !dictionary.check(word)) {
@@ -81,7 +83,10 @@ function checkSpelling(textbox) {
         })
         .join(" ");
 
-    textbox.innerHTML = correctedHTML;
+    // Only update if changes were made
+    if (text !== correctedHTML.replace(/<\/?span[^>]*>/g, '')) {
+        textbox.innerHTML = correctedHTML;
+    }
 }
 
 // Function to handle right-click on misspelled words
@@ -122,8 +127,9 @@ function showContextMenu(event, suggestions, wordElement) {
         option.onmouseover = () => (option.style.background = "#ddd");
         option.onmouseout = () => (option.style.background = "white");
         option.onclick = () => {
-            wordElement.innerText = suggestion;
+            wordElement.textContent = suggestion;
             menu.style.display = "none";
+            checkSpelling(wordElement.closest('.textbox')); // Re-check spelling after correction
         };
         menu.appendChild(option);
     });
