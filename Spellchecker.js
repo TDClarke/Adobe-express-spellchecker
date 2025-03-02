@@ -20,12 +20,21 @@ function loadDictionary(language) {
                 .then(dicData => {
                     dictionary = new Typo(language, affData, dicData);
                     console.log(`Loaded dictionary: ${language}`);
+                    checkExistingTextboxes(); // Check spelling for existing textboxes
                 });
         });
 }
 
 // Load the default dictionary
 loadDictionary(currentLanguage);
+
+// Function to check spelling in all existing textboxes on page load
+function checkExistingTextboxes() {
+    document.querySelectorAll('.textbox').forEach(textbox => {
+        enableSpellCheck(textbox);
+        checkSpelling(textbox);
+    });
+}
 
 // Function to detect when a textbox is appended
 function detectTextboxAppend() {
@@ -39,6 +48,7 @@ function detectTextboxAppend() {
                     if (node.nodeType === 1 && node.classList.contains('textbox')) {
                         console.log('New textbox added:', node);
                         enableSpellCheck(node);
+                        checkSpelling(node);
                     }
                 });
             }
@@ -156,4 +166,5 @@ function createLanguageSelector() {
 document.addEventListener('DOMContentLoaded', () => {
     createLanguageSelector();
     detectTextboxAppend();
+    checkExistingTextboxes(); // Check spelling on page load
 });
